@@ -130,6 +130,10 @@ export default function ValorantCard() {
           <span className="inline-block skew-x-[10deg]">Descargar Carta</span>
         </button>
       </div>
+      
+            
+
+
 
       {/* LA CARTA (DISEÑO FINAL) */}
       <div 
