@@ -2,16 +2,16 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
-  const { image } = await req.json(); // La imagen en base64
+  const { image } = await req.json(); 
   
   const response = await fetch("https://api.remove.bg/v1.0/removebg", {
     method: "POST",
     headers: {
-      "X-Api-Key": process.env.REMOVE_BG_API_KEY ||"", // Reemplaza esto
+      "X-Api-Key": process.env.REMOVE_BG_API_KEY ||"", 
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      image_file_b64: image.split(",")[1], // Solo enviamos los datos de la imagen
+      image_file_b64: image.split(",")[1], 
       size: "auto",
     }),
   });
