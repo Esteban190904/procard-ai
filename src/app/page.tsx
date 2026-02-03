@@ -19,10 +19,11 @@ export default function ValorantCard() {
   const cardRef = useRef<HTMLDivElement>(null);
   const [name, setName] = useState("PLAYER NAME");
   const [rank, setRank] = useState("DIAMOND");
+  const [winRate, setWinRate] = useState("58.4%"); // Nuevo estado
+  const [kdRatio, setKdRatio] = useState("1.24"); // Nuevo estado
   const [userImage, setUserImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Función para descargar la carta
   const downloadCard = async () => {
     if (cardRef.current === null) return;
     try {
@@ -39,7 +40,6 @@ export default function ValorantCard() {
     }
   };
 
-  // Lógica de carga de imagen con IA
   const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -70,7 +70,7 @@ export default function ValorantCard() {
     <div className="flex flex-col lg:flex-row items-center justify-center p-10 bg-[#0f1923] min-h-screen text-[#ece8e1] gap-10">
       
       {/* SECCIÓN DE CONTROLES */}
-      <div className="flex flex-col gap-4 bg-[#1f2326] p-6 rounded-lg border border-[#36393f] w-full max-w-md shadow-xl">
+      <div className="flex flex-col gap-4 bg-[#1f2326] p-6 rounded-lg border border-[#36393f] w-full max-w-md shadow-xl overflow-y-auto max-h-[90vh]">
         <h2 className="text-xl font-bold border-b border-red-500 pb-2 mb-4 uppercase italic">Configuración</h2>
         
         <label className="text-xs uppercase font-bold text-gray-400">Foto del Agente</label>
@@ -85,10 +85,32 @@ export default function ValorantCard() {
         <label className="text-xs uppercase font-bold text-gray-400 mt-2">Nombre</label>
         <input 
           type="text" 
+          maxLength={15}
           onChange={(e) => setName(e.target.value.toUpperCase() || "PLAYER NAME")}
           className="bg-[#0f1923] p-2 rounded border border-gray-700 focus:border-red-500 outline-none uppercase font-bold"
           placeholder="ESTEBAN"
         />
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-xs uppercase font-bold text-gray-400">Win Rate</label>
+            <input 
+              type="text" 
+              placeholder="58.4%"
+              onChange={(e) => setWinRate(e.target.value)}
+              className="w-full bg-[#0f1923] p-2 rounded border border-gray-700 focus:border-red-500 outline-none mt-1"
+            />
+          </div>
+          <div>
+            <label className="text-xs uppercase font-bold text-gray-400">K/D Ratio</label>
+            <input 
+              type="text" 
+              placeholder="1.24"
+              onChange={(e) => setKdRatio(e.target.value)}
+              className="w-full bg-[#0f1923] p-2 rounded border border-gray-700 focus:border-red-500 outline-none mt-1"
+            />
+          </div>
+        </div>
 
         <label className="text-xs uppercase font-bold text-gray-400 mt-2">Rango</label>
         <select 
@@ -114,30 +136,34 @@ export default function ValorantCard() {
         ref={cardRef}
         className="relative w-[380px] h-[550px] bg-[#0f1923] overflow-hidden shadow-2xl border-t-4 border-red-500"
       >
-        {/* Marca de agua de fondo */}
         <div className="absolute top-0 right-0 p-4 opacity-5 text-9xl font-black italic select-none">VAL</div>
         
-        {/* Foto y Gradiente */}
-        <div className="relative w-full h-[65%] bg-gradient-to-t from-[#0f1923] via-transparent to-transparent z-10 overflow-hidden">
+        {/* Contenedor de Imagen con Efecto de Escaneo */}
+        <div className="relative w-full h-[65%] z-10 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0f1923] via-transparent to-[#0f1923]/30 z-20"></div>
+          
+          {userImage && !isProcessing && (
+            <div className="absolute top-0 left-0 w-full h-1 bg-red-500/50 shadow-[0_0_15px_red] z-30 animate-scan"></div>
+          )}
+
           {isProcessing ? (
             <div className="w-full h-full bg-slate-800 flex items-center justify-center animate-pulse text-red-500 font-black italic">
               QUITANDO FONDO...
             </div>
           ) : userImage ? (
-            <img src={userImage} alt="Agente" className="w-full h-full object-cover" />
+            <img src={userImage} alt="Agente" className="w-full h-full object-cover scale-105" />
           ) : (
             <div className="w-full h-full bg-[#1b2733] flex items-center justify-center text-gray-500 italic text-sm">
               Sube tu foto para empezar
             </div>
           )}
           
-          {/* Badge de Rango con Icono Dinámico */}
           <div className="absolute bottom-4 left-4 z-20 flex items-center gap-2">
              <div className="bg-red-600 px-3 py-1 skew-x-[-12deg] flex items-center gap-2 shadow-lg border border-red-400">
                 <img 
                   src={RANK_ICONS[rank] || RANK_ICONS["IRON"]} 
                   alt="Rank" 
-                  className="w-7 h-7 skew-x-[12deg] drop-shadow-md"
+                  className="w-7 h-7 skew-x-[12deg] drop-shadow-[0_0_5px_rgba(255,255,255,0.4)]"
                 />
                 <span className="inline-block skew-x-[12deg] font-black italic text-sm tracking-tighter uppercase">
                   {rank}
@@ -146,9 +172,12 @@ export default function ValorantCard() {
           </div>
         </div>
 
-        {/* Info Inferior */}
+        {/* Info Inferior con Tipografía Pro */}
         <div className="p-6 relative z-20">
-          <h2 className="text-4xl font-black italic tracking-tighter leading-none mb-1 uppercase truncate">
+          <h2 
+            className="text-5xl font-bold italic tracking-tighter leading-none mb-1 uppercase truncate"
+            style={{ fontFamily: "'Oswald', sans-serif" }}
+          >
             {name}
           </h2>
           <div className="h-1 w-16 bg-red-500 mb-6"></div>
@@ -156,11 +185,11 @@ export default function ValorantCard() {
           <div className="grid grid-cols-2 gap-4">
             <div className="border-l-2 border-red-500/50 pl-3">
               <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Win Rate</p>
-              <p className="text-xl font-bold italic">58.4%</p>
+              <p className="text-xl font-bold italic">{winRate}</p>
             </div>
             <div className="border-l-2 border-red-500/50 pl-3">
               <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">K/D Ratio</p>
-              <p className="text-xl font-bold italic">1.24</p>
+              <p className="text-xl font-bold italic">{kdRatio}</p>
             </div>
           </div>
         </div>
@@ -169,7 +198,6 @@ export default function ValorantCard() {
           ProCard.ai // Powered by Esteban Württele Cueva
         </div>
       </div>
-
     </div>
   );
 }
